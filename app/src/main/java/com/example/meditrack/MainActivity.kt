@@ -1,5 +1,9 @@
 package com.example.meditrack
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,9 +21,13 @@ import com.example.meditrack.viewmodel.MedicationViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        createNotificationChannel()
+
         setContent {
             val viewModel: MedicationViewModel = viewModel()
             val navController = rememberNavController()
+
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             val showBottomBar = currentRoute in listOf("dashboard", "reminders", "history")
@@ -30,7 +38,6 @@ class MainActivity : ComponentActivity() {
                 surface = Color.White,
                 onSurface = Color.Black
             )
-
             val misColoresOscuros = darkColorScheme(
                 primary = Color(0xFF64B5F6),
                 background = Color(0xFF121212),
@@ -43,43 +50,36 @@ class MainActivity : ComponentActivity() {
                 colorScheme = if(viewModel.isDarkMode) misColoresOscuros else misColoresClaros
             ) {
                 Scaffold(
-                    bottomBar = {
-                        if (showBottomBar) {
-                            BottomNavBar(navController)
-                        }
-                    }
+                    bottomBar = { if (showBottomBar) BottomNavBar(navController) }
                 ) { padding ->
                     NavHost(
                         navController = navController,
                         startDestination = "login",
                         modifier = Modifier.padding(padding)
                     ) {
-                        composable("login") {
-                            LoginScreen(navController, viewModel)
-                        }
-
-                        composable("register") {
-                            RegisterScreen(navController, viewModel)
-                        }
-
-                        composable("dashboard") {
-                            DashboardScreen(navController, viewModel)
-                        }
-
-                        composable("reminders") {
-                            RemindersScreen(navController, viewModel)
-                        }
-
-                        composable("history") {
-                            HistoryScreen(navController, viewModel)
-                        }
-
-                        composable("add_medication") {
-                            AddMedicationScreen(navController, viewModel)
-                        }
+                        composable("login") { LoginScreen(navController, viewModel) }
+                        composable("register") { RegisterScreen(navController, viewModel) }
+                        composable("dashboard") { DashboardScreen(navController, viewModel) }
+                        composable("reminders") { RemindersScreen(navController, viewModel) }
+                        composable("history") { HistoryScreen(navController, viewModel) }
+                        composable("add_medication") { AddMedicationScreen(navController, viewModel) }
                     }
                 }
             }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Recordatorios MediTrack"
+            val descriptionText = "Canal para alarmas de medicamentos"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel("meditrack_channel", name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }

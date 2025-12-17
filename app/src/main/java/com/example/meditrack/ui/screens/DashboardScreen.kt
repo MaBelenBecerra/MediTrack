@@ -1,9 +1,15 @@
 package com.example.meditrack.ui.screens
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Notifications
@@ -21,13 +26,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.meditrack.utils.ReminderReceiver
 import com.example.meditrack.viewmodel.MedicationViewModel
 
 @Composable
@@ -38,6 +43,10 @@ fun DashboardScreen(navController: NavController, viewModel: MedicationViewModel
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
+            if (isGranted) {
+            } else {
+                Toast.makeText(context, "Las notificaciones son necesarias para los recordatorios", Toast.LENGTH_LONG).show()
+            }
         }
     )
 
@@ -108,7 +117,7 @@ fun DashboardScreen(navController: NavController, viewModel: MedicationViewModel
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text("Próximo medicamento", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
-                            Text("Omeprazol en 30 minutos", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text("Omeprazol en 30 min", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.weight(1f))
                         Surface(
@@ -118,6 +127,47 @@ fun DashboardScreen(navController: NavController, viewModel: MedicationViewModel
                             Text("10:00 AM", color = Color.White, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
                         }
                     }
+                }
+            }
+
+            item {
+                Button(
+                    onClick = {
+                        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                        val intent = Intent(context, ReminderReceiver::class.java)
+
+                        val pendingIntent = PendingIntent.getBroadcast(
+                            context,
+                            0,
+                            intent,
+                            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                        )
+
+                        val triggerTime = System.currentTimeMillis() + 5000
+
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                if (alarmManager.canScheduleExactAlarms()) {
+                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                                    Toast.makeText(context, "🔔 Alarma en 5 seg. ¡Sal de la app!", Toast.LENGTH_LONG).show()
+                                } else {
+                                    alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                                    Toast.makeText(context, "🔔 Alarma (inexacta) en 5 seg", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                                Toast.makeText(context, "🔔 Alarma en 5 seg. ¡Sal de la app!", Toast.LENGTH_LONG).show()
+                            }
+                        } catch (e: SecurityException) {
+                            e.printStackTrace()
+                            Toast.makeText(context, "Error de permisos", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800)),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("🔔 Probar Alarma (Esperar 5 seg)")
                 }
             }
 
@@ -134,7 +184,7 @@ fun DashboardScreen(navController: NavController, viewModel: MedicationViewModel
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(2.dp),
                     shape = RoundedCornerShape(16.dp),
-                    border = if (med.isTaken) androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF00C853)) else null
+                    border = if (med.isTaken) BorderStroke(1.dp, Color(0xFF00C853)) else null
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
@@ -167,7 +217,7 @@ fun DashboardScreen(navController: NavController, viewModel: MedicationViewModel
                             Spacer(modifier = Modifier.width(8.dp))
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                border = androidx.compose.foundation.BorderStroke(2.dp, Color.LightGray),
+                                border = BorderStroke(2.dp, Color.LightGray),
                                 modifier = Modifier.size(24.dp).clickable { viewModel.toggleMedicationTaken(med.id) }
                             ) {}
                         }
