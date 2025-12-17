@@ -1,5 +1,6 @@
 package com.example.meditrack.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -11,48 +12,73 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.meditrack.ui.components.MediButton
 import com.example.meditrack.ui.components.MediTextField
-import com.example.meditrack.viewmodel.MedicationViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: MedicationViewModel) {
+fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Surface(shape = CircleShape, color = Color(0xFF2196F3), modifier = Modifier.size(80.dp)) {
-            Icon(Icons.Default.LocalPharmacy, null, tint = Color.White, modifier = Modifier.padding(16.dp))
+        Surface(
+            shape = CircleShape,
+            color = Color(0xFF2196F3),
+            modifier = Modifier.size(80.dp)
+        ) {
+            Icon(
+                Icons.Default.LocalPharmacy,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.padding(16.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
         Text("\"Cuida tu salud\"", color = Color.Gray, fontStyle = FontStyle.Italic)
         Spacer(modifier = Modifier.height(40.dp))
 
-        MediTextField(email, { email = it }, "Correo electrónico", Icons.Outlined.Email)
+        MediTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = "Correo electrónico",
+            icon = Icons.Outlined.Email
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
-        MediTextField(password, { password = it }, "Contraseña", Icons.Outlined.Lock, PasswordVisualTransformation())
+
+        MediTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = "Contraseña",
+            icon = Icons.Outlined.Lock,
+            visualTransformation = PasswordVisualTransformation()
+        )
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        MediButton(text = "Iniciar Sesión", onClick = {
-            val nameToSave = if (email.isNotEmpty() && email.contains("@")) {
-                email.substringBefore("@").replaceFirstChar { it.uppercase() }
-            } else {
-                "Maria"
+        MediButton(
+            text = "Iniciar Sesión",
+            onClick = {
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    navController.navigate("dashboard")
+                } else {
+                    Toast.makeText(context, "Por favor ingresa correo y contraseña", Toast.LENGTH_SHORT).show()
+                }
             }
-
-            viewModel.updateUserName(nameToSave)
-
-            navController.navigate("dashboard")
-        })
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
