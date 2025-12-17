@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MedicationViewModel = viewModel()
             val navController = rememberNavController()
-
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             val showBottomBar = currentRoute in listOf("dashboard", "reminders", "history")
@@ -55,14 +54,29 @@ class MainActivity : ComponentActivity() {
                         startDestination = "login",
                         modifier = Modifier.padding(padding)
                     ) {
-                        composable("login") { LoginScreen(navController) }
-                        composable("register") { RegisterScreen(navController, viewModel) }
+                        composable("login") {
+                            LoginScreen(navController, viewModel)
+                        }
 
-                        composable("dashboard") { DashboardScreen(navController, viewModel) }
-                        composable("reminders") { RemindersScreen(navController, viewModel) }
-                        composable("history") { HistoryScreen(navController, viewModel) }
+                        composable("register") {
+                            RegisterScreen(navController, viewModel)
+                        }
 
-                        composable("add_medication") { AddMedicationScreen(navController, viewModel) }
+                        composable("dashboard") {
+                            DashboardScreen(navController, viewModel)
+                        }
+
+                        composable("reminders") {
+                            RemindersScreen(navController, viewModel)
+                        }
+
+                        composable("history") {
+                            HistoryScreen(navController, viewModel)
+                        }
+
+                        composable("add_medication") {
+                            AddMedicationScreen(navController, viewModel)
+                        }
                     }
                 }
             }

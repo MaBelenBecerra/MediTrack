@@ -47,12 +47,12 @@ fun RegisterScreen(navController: NavController, viewModel: MedicationViewModel)
         Spacer(modifier = Modifier.height(32.dp))
 
         MediButton(text = "Registrarse", onClick = {
-            viewModel.registerUser(name, email)
+            viewModel.setUserName(name)
+
             navController.navigate("dashboard") {
                 popUpTo("login") { inclusive = true }
             }
         })
-
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = { navController.popBackStack() }) {

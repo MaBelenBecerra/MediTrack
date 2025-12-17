@@ -14,13 +14,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.meditrack.ui.components.MediButton
 import com.example.meditrack.ui.components.MediTextField
+import com.example.meditrack.viewmodel.MedicationViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, viewModel: MedicationViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -69,7 +69,17 @@ fun LoginScreen(navController: NavController) {
 
         MediButton(
             text = "Iniciar Sesión",
-            onClick = { navController.navigate("dashboard") }
+            onClick = {
+                val nameToSave = if (email.isNotEmpty() && email.contains("@")) {
+                    email.substringBefore("@").replaceFirstChar { it.uppercase() }
+                } else {
+                    "Maria"
+                }
+
+                viewModel.setUserName(nameToSave)
+
+                navController.navigate("dashboard")
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
