@@ -21,9 +21,9 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
 
     init {
         _medications.value = listOf(
-            Medication("1", "Omeprazol", "20mg", "Cada 8h", "10:00 AM", false, 0xFF42A5F5), // Azul
-            Medication("2", "Aspirina", "100mg", "Cada 12h", "08:00 AM", true, 0xFF66BB6A), // Verde
-            Medication("3", "Metformina", "500mg", "Cada 24h", "2:00 PM", false, 0xFFAB47BC) // Morado
+            Medication("1", "Omeprazol", "20mg", "Cada 8h", "10:00 AM", false, 0xFF42A5F5),
+            Medication("2", "Aspirina", "100mg", "Cada 12h", "08:00 AM", true, 0xFF66BB6A),
+            Medication("3", "Metformina", "500mg", "Cada 24h", "2:00 PM", false, 0xFFAB47BC)
         )
     }
 
@@ -36,7 +36,7 @@ class MedicationViewModel(application: Application) : AndroidViewModel(applicati
         _medications.value = _medications.value + med
     }
 
-    fun setUserName(name: String) {
+    fun updateUserName(name: String) {
         userName = name
     }
 

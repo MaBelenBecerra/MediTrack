@@ -27,9 +27,7 @@ fun RegisterScreen(navController: NavController, viewModel: MedicationViewModel)
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -47,12 +45,13 @@ fun RegisterScreen(navController: NavController, viewModel: MedicationViewModel)
         Spacer(modifier = Modifier.height(32.dp))
 
         MediButton(text = "Registrarse", onClick = {
-            viewModel.setUserName(name)
+            viewModel.updateUserName(name)
 
             navController.navigate("dashboard") {
                 popUpTo("login") { inclusive = true }
             }
         })
+
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = { navController.popBackStack() }) {

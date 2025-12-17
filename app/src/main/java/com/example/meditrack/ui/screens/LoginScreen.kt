@@ -25,62 +25,34 @@ fun LoginScreen(navController: NavController, viewModel: MedicationViewModel) {
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Surface(
-            shape = CircleShape,
-            color = Color(0xFF2196F3),
-            modifier = Modifier.size(80.dp)
-        ) {
-            Icon(
-                Icons.Default.LocalPharmacy,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.padding(16.dp)
-            )
+        Surface(shape = CircleShape, color = Color(0xFF2196F3), modifier = Modifier.size(80.dp)) {
+            Icon(Icons.Default.LocalPharmacy, null, tint = Color.White, modifier = Modifier.padding(16.dp))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
         Text("\"Cuida tu salud\"", color = Color.Gray, fontStyle = FontStyle.Italic)
         Spacer(modifier = Modifier.height(40.dp))
 
-        MediTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = "Correo electrónico",
-            icon = Icons.Outlined.Email
-        )
-
+        MediTextField(email, { email = it }, "Correo electrónico", Icons.Outlined.Email)
         Spacer(modifier = Modifier.height(16.dp))
-
-        MediTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = "Contraseña",
-            icon = Icons.Outlined.Lock,
-            visualTransformation = PasswordVisualTransformation()
-        )
-
+        MediTextField(password, { password = it }, "Contraseña", Icons.Outlined.Lock, PasswordVisualTransformation())
         Spacer(modifier = Modifier.height(32.dp))
 
-        MediButton(
-            text = "Iniciar Sesión",
-            onClick = {
-                val nameToSave = if (email.isNotEmpty() && email.contains("@")) {
-                    email.substringBefore("@").replaceFirstChar { it.uppercase() }
-                } else {
-                    "Maria"
-                }
-
-                viewModel.setUserName(nameToSave)
-
-                navController.navigate("dashboard")
+        MediButton(text = "Iniciar Sesión", onClick = {
+            val nameToSave = if (email.isNotEmpty() && email.contains("@")) {
+                email.substringBefore("@").replaceFirstChar { it.uppercase() }
+            } else {
+                "Maria"
             }
-        )
+
+            viewModel.updateUserName(nameToSave)
+
+            navController.navigate("dashboard")
+        })
 
         Spacer(modifier = Modifier.height(16.dp))
 
