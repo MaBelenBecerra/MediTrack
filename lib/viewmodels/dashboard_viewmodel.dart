@@ -23,4 +23,8 @@ class DashboardViewModel extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+  Future<void> addMedication(MedicationModel medication) async {
+    await _repository.addMedicationLocal(medication);
+    await fetchMedications(); // Recarga la lista para que aparezca el nuevo dato
+  }
 }

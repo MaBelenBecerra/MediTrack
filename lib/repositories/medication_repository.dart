@@ -29,4 +29,7 @@ class MedicationRepository {
     //Fallback retorna lo que haya guardado en la bd local
     return _box.values.cast<MedicationModel>().toList();
   }
+  Future<void> addMedicationLocal(MedicationModel medication) async {
+    await _box.add(medication);
+  }
 }

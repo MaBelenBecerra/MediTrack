@@ -75,9 +75,7 @@ class DashboardScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Pronto agregaremos medicamentos!')),
-          );
+          _mostrarDialogoAgregar(context);
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
