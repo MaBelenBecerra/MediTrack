@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../core/design_system/design_system.dart';
 import '../../data/models/medication_model.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
+import '../../core/utils/permission_manager.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -75,8 +76,11 @@ class DashboardScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
-        onPressed: () {
-          _mostrarDialogoAgregar(context);
+        onPressed: () async {
+          await PermissionManager.requestAppPermissions();
+          if (context.mounted) {
+            _mostrarDialogoAgregar(context);
+          }
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
