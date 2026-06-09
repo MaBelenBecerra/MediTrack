@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/design_system/design_system.dart';
+import '../../data/models/medication_model.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -22,16 +23,16 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          //Cargando
+          // Cargando
           if (viewModel.isLoading) {
             return const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
-          //Lista vacía
+          // Lista vacía
           if (viewModel.medications.isEmpty) {
-            return Center(
+            return const Center(
               child: Text(
                 'No tienes medicamentos programados hoy.',
                 style: AppTypography.body,
@@ -39,7 +40,7 @@ class DashboardScreen extends StatelessWidget {
             );
           }
 
-          //Lista con datos
+          // Lista con datos
           return ListView.builder(
             padding: EdgeInsets.all(16.w),
             itemCount: viewModel.medications.length,
@@ -79,6 +80,64 @@ class DashboardScreen extends StatelessWidget {
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
+    );
+  }
+
+  void _mostrarDialogoAgregar(BuildContext context) {
+    final nombreController = TextEditingController();
+    final dosisController = TextEditingController();
+    final horaController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Nuevo Medicamento', style: AppTypography.titleMedium),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nombreController,
+                decoration: const InputDecoration(labelText: 'Nombre de la pastilla'),
+              ),
+              TextField(
+                controller: dosisController,
+                decoration: const InputDecoration(labelText: 'Dosis (ej. 1 pastilla)'),
+              ),
+              TextField(
+                controller: horaController,
+                decoration: const InputDecoration(labelText: 'Hora (ej. 08:00 AM)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar', style: TextStyle(color: AppColors.textGray)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: () {
+                //Creamos el modelo
+                final nuevoMedicamento = MedicationModel(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  nombre: nombreController.text,
+                  dosis: dosisController.text,
+                  hora: horaController.text,
+                );
+
+                //Usamos el context.read para llamar al método del ViewModel
+                context.read<DashboardViewModel>().addMedication(nuevoMedicamento);
+
+                //Cerramos el diálogo
+                Navigator.pop(context);
+              },
+              child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
