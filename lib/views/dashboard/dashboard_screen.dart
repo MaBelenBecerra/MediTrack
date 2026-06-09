@@ -25,10 +25,17 @@ class DashboardScreen extends StatelessWidget {
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
           // Cargando
-          if (viewModel.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            );
+          // Detectar modo offline y lanzar SnackBar de forma segura
+          if (viewModel.isOffline) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Modo sin conexión. Mostrando datos locales.'),
+                  backgroundColor: AppColors.alert,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            });
           }
 
           // Lista vacía
