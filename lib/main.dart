@@ -5,11 +5,14 @@ import 'package:provider/provider.dart';
 
 import 'data/models/medication_model.dart';
 import 'repositories/medication_repository.dart';
+import 'viewmodels/auth_viewmodel.dart';
 import 'viewmodels/dashboard_viewmodel.dart';
+import 'views/auth/login_screen.dart';
 import 'views/dashboard/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
   await Hive.initFlutter();
   Hive.registerAdapter(MedicationModelAdapter());
   await Hive.openBox('medications_box');
@@ -17,6 +20,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
         ChangeNotifierProvider(
           create: (_) => DashboardViewModel(MedicationRepository())..fetchMedications(),
         ),
@@ -46,7 +50,7 @@ class MediTrackApp extends StatelessWidget {
           home: child,
         );
       },
-      child: const DashboardScreen(),
+      child: const LoginScreen(),
     );
   }
 }
