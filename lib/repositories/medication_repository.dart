@@ -29,7 +29,16 @@ class MedicationRepository {
     //Fallback retorna lo que haya guardado en la bd local
     return _box.values.cast<MedicationModel>().toList();
   }
-  Future<void> addMedicationLocal(MedicationModel medication) async {
+  // Nuevo método para enviar a la API y guardar localmente
+  Future<void> addMedication(MedicationModel medication) async {
+    try {
+      //Intentamos enviar el POST a tu backend NestJS
+      await _dio.post('/medicamentos', data: medication.toJson());
+    } catch (e) {
+      // Si falla (no hay internet o el server está caído), capturamos el error
+      // El flujo continuará para guardarlo localmente y sincronizar después.
+    }
+    //Guardamos en la caché de Hive (modo offline)
     await _box.add(medication);
   }
 }
