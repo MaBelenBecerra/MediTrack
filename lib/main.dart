@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'data/models/medication_model.dart';
 import 'repositories/medication_repository.dart';
 import 'viewmodels/dashboard_viewmodel.dart';
+import 'views/dashboard/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,11 +46,7 @@ class MediTrackApp extends StatelessWidget {
           home: child,
         );
       },
-      child: const Scaffold(
-        body: Center(
-          child: Text('MediTrack - Base Lista!'),
-        ),
-      ),
+      child: const DashboardScreen(),
     );
   }
 }
