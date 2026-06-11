@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
+import '../core/utils/notification_helper.dart';
 import '../data/models/medication_model.dart';
 import '../repositories/medication_repository.dart';
 
@@ -40,6 +41,7 @@ class DashboardViewModel extends ChangeNotifier {
 
   Future<void> addMedication(MedicationModel medication) async {
     await _repository.addMedication(medication);
+    await NotificationHelper.showNotification('¡Medicamento Guardado!', 'Registraste: ${medication.nombre}');
     await fetchMedications();
   }
 }
