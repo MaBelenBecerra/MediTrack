@@ -30,7 +30,7 @@ class AdherenceScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 40.h),
-                Text('Progreso de Hoy', style: AppTypography.titleLarge),
+                const Text('Progreso de Hoy', style: AppTypography.titleLarge),
                 SizedBox(height: 40.h),
                 Stack(
                   alignment: Alignment.center,
@@ -76,7 +76,11 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12.r), border: Border.all(color: color.withOpacity(0.3))),
+      decoration: BoxDecoration(
+        color: Colors.white, 
+        borderRadius: BorderRadius.circular(12.r), 
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
       child: Column(
         children: [
           Text(value, style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: color)),
