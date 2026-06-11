@@ -21,13 +21,14 @@ class MedicationModelAdapter extends TypeAdapter<MedicationModel> {
       nombre: fields[1] as String,
       dosis: fields[2] as String,
       hora: fields[3] as String,
+      imagePath: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MedicationModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class MedicationModelAdapter extends TypeAdapter<MedicationModel> {
       ..writeByte(2)
       ..write(obj.dosis)
       ..writeByte(3)
-      ..write(obj.hora);
+      ..write(obj.hora)
+      ..writeByte(4)
+      ..write(obj.imagePath);
   }
 
   @override

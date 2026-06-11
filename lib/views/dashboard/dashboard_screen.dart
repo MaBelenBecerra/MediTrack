@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/design_system/design_system.dart';
 import '../../core/utils/permission_manager.dart';
 import '../../data/models/medication_model.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';
+import '../adherence/adherence_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -17,20 +19,36 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'MediTrack',
-          style: AppTypography.titleLarge.copyWith(color: Colors.white),
+          style: AppTypography.titleLarge.copyWith(
+            color: Colors.white,
+          ),
         ),
         backgroundColor: AppColors.primary,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.analytics,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AdherenceScreen(),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          // Cargando
-          // Detectar modo offline y lanzar SnackBar de forma segura
           if (viewModel.isOffline) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Modo sin conexión. Mostrando datos locales.'),
+                  content: Text(
+                    'Modo sin conexión. Mostrando datos locales.',
+                  ),
                   backgroundColor: AppColors.alert,
                   duration: Duration(seconds: 3),
                 ),
@@ -38,7 +56,6 @@ class DashboardScreen extends StatelessWidget {
             });
           }
 
-          // Lista vacía
           if (viewModel.medications.isEmpty) {
             return const Center(
               child: Text(
@@ -48,12 +65,12 @@ class DashboardScreen extends StatelessWidget {
             );
           }
 
-          // Lista con datos
           return ListView.builder(
             padding: EdgeInsets.all(16.w),
             itemCount: viewModel.medications.length,
             itemBuilder: (context, index) {
               final med = viewModel.medications[index];
+
               return Card(
                 color: Colors.white,
                 margin: EdgeInsets.only(bottom: 12.h),
@@ -64,9 +81,15 @@ class DashboardScreen extends StatelessWidget {
                 child: ListTile(
                   leading: const CircleAvatar(
                     backgroundColor: AppColors.primaryLight,
-                    child: Icon(Icons.medication, color: AppColors.primary),
+                    child: Icon(
+                      Icons.medication,
+                      color: AppColors.primary,
+                    ),
                   ),
-                  title: Text(med.nombre, style: AppTypography.titleMedium),
+                  title: Text(
+                    med.nombre,
+                    style: AppTypography.titleMedium,
+                  ),
                   subtitle: Text(
                     '${med.dosis} • ${med.hora}',
                     style: AppTypography.body,
@@ -85,11 +108,15 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
         onPressed: () async {
           await PermissionManager.requestAppPermissions();
+
           if (context.mounted) {
             _mostrarDialogoAgregar(context);
           }
         },
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -99,52 +126,105 @@ class DashboardScreen extends StatelessWidget {
     final dosisController = TextEditingController();
     final horaController = TextEditingController();
 
+    String? rutaImagen;
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          title: const Text('Nuevo Medicamento', style: AppTypography.titleMedium),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nombreController,
-                decoration: const InputDecoration(labelText: 'Nombre de la pastilla'),
-              ),
-              TextField(
-                controller: dosisController,
-                decoration: const InputDecoration(labelText: 'Dosis (ej. 1 pastilla)'),
-              ),
-              TextField(
-                controller: horaController,
-                decoration: const InputDecoration(labelText: 'Hora (ej. 08:00 AM)'),
-              ),
-            ],
+          title: const Text(
+            'Nuevo Medicamento',
+            style: AppTypography.titleMedium,
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nombreController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre de la pastilla',
+                  ),
+                ),
+                TextField(
+                  controller: dosisController,
+                  decoration: const InputDecoration(
+                    labelText: 'Dosis (ej. 1 pastilla)',
+                  ),
+                ),
+                TextField(
+                  controller: horaController,
+                  decoration: const InputDecoration(
+                    labelText: 'Hora (ej. 08:00 AM)',
+                  ),
+                ),
+
+                SizedBox(height: 16.h),
+
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text('Tomar Foto a la Pastilla'),
+                  onPressed: () async {
+                    final picker = ImagePicker();
+
+                    final XFile? foto = await picker.pickImage(
+                      source: ImageSource.camera,
+                    );
+
+                    if (foto != null) {
+                      rutaImagen = foto.path;
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Foto capturada correctamente'),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar', style: TextStyle(color: AppColors.textGray)),
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: AppColors.textGray,
+                ),
+              ),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
               onPressed: () {
-                //Creamos el modelo
                 final nuevoMedicamento = MedicationModel(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  id: DateTime.now()
+                      .millisecondsSinceEpoch
+                      .toString(),
                   nombre: nombreController.text,
                   dosis: dosisController.text,
                   hora: horaController.text,
+                  imagePath: rutaImagen,
                 );
 
-                //Usamos el context.read para llamar al método del ViewModel
-                context.read<DashboardViewModel>().addMedication(nuevoMedicamento);
+                context
+                    .read<DashboardViewModel>()
+                    .addMedication(nuevoMedicamento);
 
-                //Cerramos el diálogo
                 Navigator.pop(context);
               },
-              child: const Text('Guardar', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Guardar',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         );
