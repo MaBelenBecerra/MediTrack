@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
+import 'core/utils/notification_helper.dart';
 import 'data/models/medication_model.dart';
 import 'repositories/medication_repository.dart';
 import 'viewmodels/auth_viewmodel.dart';
@@ -11,6 +12,7 @@ import 'views/auth/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationHelper.init();
   
   await Hive.initFlutter();
   Hive.registerAdapter(MedicationModelAdapter());
