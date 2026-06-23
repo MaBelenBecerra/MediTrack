@@ -8,6 +8,7 @@ class AuthViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   User? get currentUser => _auth.currentUser;
 
+  // LOGIN REAL EN FIREBASE
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
@@ -23,6 +24,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  // REGISTRO REAL EN FIREBASE
   Future<bool> register(String email, String password) async {
     _isLoading = true;
     notifyListeners();

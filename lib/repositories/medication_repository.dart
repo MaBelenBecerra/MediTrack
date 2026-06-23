@@ -1,38 +1,57 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive/hive.dart';
-import '../data/models/medication_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+import 'package:meditrack/data/models/medication_model.dart';
 
 class MedicationRepository {
+  // 1. Obtenemos la caja directamente de Hive aquí
+  final Box<MedicationModel> _medicationBox = Hive.box<MedicationModel>('medications_box');
   final CollectionReference _db = FirebaseFirestore.instance.collection('medicamentos');
-  final Box _box = Hive.box('medications_box');
+
+  // 2. Dejamos el constructor vacío para que tu main.dart no marque error
+  MedicationRepository();
 
   Future<List<MedicationModel>> getMedications() async {
     try {
-      //Intento traer de Firebase
+      //(Firestore)
       final querySnapshot = await _db.get();
+      
       final List<MedicationModel> medications = querySnapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return MedicationModel.fromJson({...data, 'id': doc.id});
       }).toList();
 
-      //Guardo en caché (Hive)
-      await _box.clear();
-      await _box.addAll(medications);
+      //caché local (Hive)
+      await _medicationBox.clear();
+      await _medicationBox.addAll(medications);
+
       return medications;
     } catch (e) {
-      //Si no hay internet, devuelvo caché
-      return _box.values.cast<MedicationModel>().toList();
+      // Corrección: Usamos debugPrint en lugar de print
+      debugPrint('⚠️ Modo Offline activado: $e'); 
+      
+      //Fallback: no hay internet, devolvemos lo que hay en Hive
+      if (_medicationBox.isEmpty) return [];
+      return _medicationBox.values.toList();
     }
   }
 
-  Future<void> addMedication(MedicationModel medication) async {
+  Future<bool> addMedication(MedicationModel medication) async {
     try {
-      // Guardar en la nube
-      await _db.add(medication.toJson());
+      // Guardar en Firestore
+      final docRef = await _db.add(medication.toJson());
+      
+      //Guardar en Hive con el ID real de Firebase
+      final medWithId = MedicationModel.fromJson({...medication.toJson(), 'id': docRef.id});
+      await _medicationBox.add(medWithId);
+      return true;
     } catch (e) {
-      // Manejo silencioso si falla la red
+      debugPrint('⚠️ Error al subir a Firebase, guardando en local: $e');
+      
+      // Si falla Firebase, lo guardo al menos en local
+      await _medicationBox.add(medication);
+      return true; 
     }
-    // Respaldo local inmediato
-    await _box.add(medication);
   }
 }
