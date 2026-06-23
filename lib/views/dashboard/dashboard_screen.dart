@@ -16,13 +16,13 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: Text(
           'MediTrack',
           style: AppTypography.titleLarge.copyWith(
             color: Colors.white,
-            fontFamily: 'Merriweather',
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: const Color(0xFF005088),
@@ -39,121 +39,202 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: Consumer<DashboardViewModel>(
         builder: (context, viewModel, child) {
-          if (viewModel.medications.isEmpty) {
-            return const Center(
-              child: Text(
-                'No tienes medicamentos programados hoy.',
-                style: AppTypography.body,
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: EdgeInsets.all(16.w),
-            itemCount: viewModel.medications.length,
-            itemBuilder: (context, index) {
-              final med = viewModel.medications[index];
-
-              return Card(
-                color: Colors.white,
-                margin: EdgeInsets.only(bottom: 16.h),
-                elevation: 3,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.r),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.all(16.w),
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF005088), Color(0xFF007BBF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF005088)..withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    )
+                  ],
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(12.w),
-                  child: Row(
-                    children: [
-                      med.imagePath != null && med.imagePath!.isNotEmpty
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(12.r),
-                              child: Image.file(
-                                File(med.imagePath!),
-                                width: 70.w,
-                                height: 70.w,
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Container(
-                              width: 70.w,
-                              height: 70.w,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE2E8F0),
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: const Icon(
-                                Icons.medication,
-                                color: Color(0xFF005088),
-                                size: 32,
-                              ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '¡Progreso de Hoy!',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.bold,
                             ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              med.nombre,
-                              style: AppTypography.titleMedium.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF005088),
-                              ),
+                          ),
+                          SizedBox(height: 6.h),
+                          Text(
+                            'Tienes notificaciones pendientes para tus tomas de la tarde.',
+                            style: TextStyle(
+                              color: Colors.white..withValues(alpha: 0.85),
+                              fontSize: 13.sp,
                             ),
-                            SizedBox(height: 4.h),
-                            Text(
-                              'Dosis: ${med.dosis}',
-                              style: AppTypography.body.copyWith(color: Colors.grey[700]),
-                            ),
-                            SizedBox(height: 6.h),
-                            Row(
-                              children: [
-                                const Icon(Icons.access_time, size: 16, color: Color(0xFF11CAA0)), // Acento Teal
-                                SizedBox(width: 6.w),
-                                Text(
-                                  med.hora,
-                                  style: AppTypography.body.copyWith(
-                                    color: const Color(0xFF11CAA0),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.notifications_active, color: const Color(0xFF11CAA0), size: 40.sp),
+                  ],
+                ),
+              ),
+              
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                child: Text(
+                  'Tus Medicamentos',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF005088),
+                  ),
+                ),
+              ),
+
+              Expanded(
+                child: viewModel.medications.isEmpty
+                    ? const Center(child: Text('No hay medicamentos programados.'))
+                    : ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        itemCount: viewModel.medications.length,
+                        itemBuilder: (context, index) {
+                          final med = viewModel.medications[index];
+                          
+                          final List<Color> indicatorColors = [const Color(0xFF005088), const Color(0xFF11CAA0), const Color(0xFF9333EA)];
+                          final Color sideColor = indicatorColors[index % indicatorColors.length];
+
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 14.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black..withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                )
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.check_circle_outline,
-                          color: Color(0xFF11CAA0),
-                          size: 38,
-                        ),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('¡Pastilla marcada como tomada!'),
-                              backgroundColor: Color(0xFF11CAA0),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                children: [
+                                  // Línea decorativa izquierda de Figma
+                                  Container(
+                                    width: 6.w,
+                                    decoration: BoxDecoration(
+                                      color: sideColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(16.r),
+                                        bottomLeft: Radius.circular(16.r),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 12.w),
+                                  
+                                  // Imagen o Icono Circular
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                                    key: ValueKey(med.id),
+                                    child: med.imagePath != null && med.imagePath!.isNotEmpty
+                                        ? ClipRRect(
+                                            borderRadius: BorderRadius.circular(12.r),
+                                            child: Image.file(
+                                              File(med.imagePath!),
+                                              width: 55.w,
+                                              height: 55.w,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          )
+                                        : Container(
+                                            width: 55.w,
+                                            height: 55.w,
+                                            decoration: BoxDecoration(
+                                              color: sideColor..withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(12.r),
+                                            ),
+                                            child: Icon(Icons.medication, color: sideColor, size: 28),
+                                          ),
+                                  ),
+                                  SizedBox(width: 14.w),
+                                  
+                                  // Textos descriptivos
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          med.nombre,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color(0xFF1E293B),
+                                          ),
+                                        ),
+                                        SizedBox(height: 2.h),
+                                        Text(
+                                          'Dosis: ${med.dosis}',
+                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 13.sp),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.access_time_filled, size: 14.sp, color: sideColor),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              med.hora,
+                                              style: TextStyle(
+                                                color: sideColor,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 13.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  // Botón de confirmación Check
+                                  IconButton(
+                                    icon: const Icon(Icons.check_circle, color: Color(0xFF11CAA0), size: 34),
+                                    onPressed: () {},
+                                  ),
+                                  SizedBox(width: 8.w),
+                                ],
+                              ),
                             ),
                           );
                         },
                       ),
-                    ],
-                  ),
-                ),
-              );
-            },
+              ),
+            ],
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF11CAA0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
         onPressed: () async {
           await PermissionManager.requestAppPermissions();
           if (context.mounted) {
             _mostrarDialogoAgregar(context);
           }
         },
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
@@ -161,193 +242,136 @@ class DashboardScreen extends StatelessWidget {
   void _mostrarDialogoAgregar(BuildContext context) {
     final nombreController = TextEditingController();
     final dosisController = TextEditingController();
-    
     TimeOfDay? horaSeleccionada;
     String? rutaImagen;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(topLeft: Radius.circular(24.r), topRight: Radius.circular(24.r)),
+      ),
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            return Dialog(
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.r),
+            return Padding(
+              padding: EdgeInsets.only(
+                top: 24.w, left: 24.w, right: 24.w,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24.w,
               ),
-              child: Padding(
-                padding: EdgeInsets.all(24.w),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Nuevo Medicamento',
-                        style: AppTypography.titleLarge.copyWith(
-                          color: const Color(0xFF005088),
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Merriweather',
-                        ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Agregar Medicamento',
+                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color(0xFF005088)),
+                    ),
+                    SizedBox(height: 20.h),
+                    TextField(
+                      controller: nombreController,
+                      decoration: InputDecoration(
+                        labelText: 'Nombre de la pastilla',
+                        prefixIcon: const Icon(Icons.medication, color: Color(0xFF005088)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r)),
                       ),
-                      SizedBox(height: 20.h),
-                      TextField(
-                        controller: nombreController,
-                        decoration: InputDecoration(
-                          labelText: 'Nombre de la pastilla',
-                          prefixIcon: const Icon(Icons.medication, color: Color(0xFF005088)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
+                    ),
+                    SizedBox(height: 14.h),
+                    TextField(
+                      controller: dosisController,
+                      decoration: InputDecoration(
+                        labelText: 'Dosis (ej. 1 tableta)',
+                        prefixIcon: const Icon(Icons.numbers, color: Color(0xFF005088)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r)),
                       ),
-                      SizedBox(height: 16.h),
-                      TextField(
-                        controller: dosisController,
-                        decoration: InputDecoration(
-                          labelText: 'Dosis (ej. 1 pastilla)',
-                          prefixIcon: const Icon(Icons.format_list_numbered, color: Color(0xFF005088)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
+                    ),
+                    SizedBox(height: 16.h),
+                    
+                    ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                        side: BorderSide(color: Colors.grey.shade300),
                       ),
-                      SizedBox(height: 20.h),
-                      
-                      // Selector de hora estilizado
-                      InkWell(
-                        borderRadius: BorderRadius.circular(12.r),
-                        onTap: () async {
-                          final TimeOfDay? picked = await showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          );
-                          if (picked != null) {
-                            setStateDialog(() => horaSeleccionada = picked);
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.access_time, color: Color(0xFF11CAA0)),
-                              SizedBox(width: 12.w),
-                              Text(
-                                horaSeleccionada == null 
-                                    ? 'Seleccionar Hora de Toma' 
-                                    : 'Hora: ${horaSeleccionada!.format(context)}',
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: horaSeleccionada == null ? Colors.grey.shade600 : Colors.black,
-                                  fontWeight: horaSeleccionada == null ? FontWeight.normal : FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      leading: const Icon(Icons.alarm, color: Color(0xFF11CAA0)),
+                      title: Text(
+                        horaSeleccionada == null ? 'Establecer Horario' : 'Hora: ${horaSeleccionada!.format(context)}',
+                        style: TextStyle(fontWeight: horaSeleccionada == null ? FontWeight.normal : FontWeight.bold),
                       ),
-                      SizedBox(height: 20.h),
+                      onTap: () async {
+                        final TimeOfDay? picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+                        if (picked != null) setStateDialog(() => horaSeleccionada = picked);
+                      },
+                    ),
+                    SizedBox(height: 16.h),
 
-                      // Previsualización de la fotografía tomada
-                      if (rutaImagen != null) ...[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: Image.file(
-                            File(rutaImagen!), 
-                            height: 140.h, 
-                            width: double.infinity, 
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(height: 16.h),
-                      ],
-                        
-                      // Botón de cámara
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF11CAA0),
-                          minimumSize: Size(double.infinity, 52.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                        ),
-                        icon: const Icon(Icons.camera_alt, color: Colors.white),
-                        label: Text(
-                          rutaImagen == null ? 'Tomar Foto de la Pastilla' : 'Cambiar Fotografía', 
-                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () async {
-                          final picker = ImagePicker();
-                          final XFile? foto = await picker.pickImage(source: ImageSource.camera);
-                          if (foto != null) {
-                            setStateDialog(() => rutaImagen = foto.path);
-                          }
-                        },
+                    if (rutaImagen != null) ...[
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14.r),
+                        child: Image.file(File(rutaImagen!), height: 120.h, width: double.infinity, fit: BoxFit.cover),
                       ),
-                      SizedBox(height: 24.h),
-                      
-                      // Acciones inferiores
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
+                      SizedBox(height: 12.h),
+                    ],
+
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF005088),
+                        minimumSize: Size(double.infinity, 50.h),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                      ),
+                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      label: Text(rutaImagen == null ? 'Tomar Foto' : 'Cambiar Foto', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final XFile? foto = await picker.pickImage(source: ImageSource.camera);
+                        if (foto != null) setStateDialog(() => rutaImagen = foto.path);
+                      },
+                    ),
+                    SizedBox(height: 24.h),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                            ),
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                            child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
                           ),
-                          SizedBox(width: 12.w),
-                          ElevatedButton(
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF005088),
-                              padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 14.h),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
+                              backgroundColor: const Color(0xFF11CAA0),
+                              padding: EdgeInsets.symmetric(vertical: 14.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
                             ),
                             onPressed: () {
-                              if (nombreController.text.isEmpty || dosisController.text.isEmpty || horaSeleccionada == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Por favor completa todos los campos y define la hora.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                                return;
-                              }
-
-                              final nuevoMedicamento = MedicationModel(
+                              if (nombreController.text.isEmpty || dosisController.text.isEmpty || horaSeleccionada == null) return;
+                              final nuevo = MedicationModel(
                                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                                 nombre: nombreController.text,
                                 dosis: dosisController.text,
                                 hora: horaSeleccionada!.format(context),
                                 imagePath: rutaImagen,
                               );
-
-                              context.read<DashboardViewModel>().addMedication(nuevoMedicamento);
+                              context.read<DashboardViewModel>().addMedication(nuevo);
                               Navigator.pop(context);
                             },
-                            child: const Text('Guardar', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                            child: const Text('Guardar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             );
-          }
+          },
         );
       },
     );
