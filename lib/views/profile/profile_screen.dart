@@ -119,7 +119,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   const Text(
-                    'María Belén Becerra',
+                    'Paciente',
                     style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 8.0),
