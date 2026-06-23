@@ -372,7 +372,7 @@ class _MedicationCardState extends State<MedicationCard> {
               // Switch
               Switch(
                 value: isTaken,
-                activeColor: widget.cardColor,
+                activeThumbColor: widget.cardColor,
                 onChanged: (value) {
                   setState(() {
                     isTaken = value;
