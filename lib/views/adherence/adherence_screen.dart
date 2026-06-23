@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:meditrack_design_system/design_system.dart';
-import 'package:provider/provider.dart';
-
-import '../../viewmodels/dashboard_viewmodel.dart';
 
 class AdherenceScreen extends StatelessWidget {
   const AdherenceScreen({super.key});
@@ -11,80 +7,105 @@ class AdherenceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Historial de Adherencia', style: TextStyle(color: Colors.white)),
-        backgroundColor: AppColors.primary,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('Historial', style: TextStyle(color: const Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18.sp)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF1E293B)),
+        centerTitle: true,
       ),
-      body: Consumer<DashboardViewModel>(
-        builder: (context, viewModel, child) {
-          final total = viewModel.medications.length;
-          // Simulamos que el 80% se tomaron a tiempo para la demostración
-          final tomadas = (total > 0) ? (total * 0.8).round() : 0;
-          final porcentaje = total > 0 ? (tomadas / total) : 0.0;
-
-          return Padding(
-            padding: EdgeInsets.all(24.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: 40.h),
-                const Text('Progreso de Hoy', style: AppTypography.titleLarge),
-                SizedBox(height: 40.h),
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 200.w,
-                      height: 200.w,
-                      child: CircularProgressIndicator(
-                        value: porcentaje,
-                        strokeWidth: 20.w,
-                        backgroundColor: AppColors.primaryLight,
-                        color: AppColors.success,
-                      ),
-                    ),
-                    Text('${(porcentaje * 100).toInt()}%', style: TextStyle(fontSize: 48.sp, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                  ],
+      body: Padding(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0066FF), Color(0xFF11CAA0)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                SizedBox(height: 40.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _StatCard(title: 'Tomadas', value: tomadas.toString(), color: AppColors.success),
-                    _StatCard(title: 'Programadas', value: total.toString(), color: AppColors.primary),
-                  ],
-                )
-              ],
+                borderRadius: BorderRadius.circular(20.r),
+                boxShadow: [BoxShadow(color: const Color(0xFF0066FF).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 8))],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Adherencia de\nesta semana',
+                      style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold, height: 1.2),
+                    ),
+                  ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 70.w, height: 70.w,
+                        child: CircularProgressIndicator(
+                          value: 0.75, // 75% mockeado, conectado a ViewModel
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          color: Colors.white,
+                          strokeWidth: 8,
+                        ),
+                      ),
+                      Text('75%', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.sp)),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+            SizedBox(height: 32.h),
+
+            Text('Tus tomas', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+            SizedBox(height: 16.h),
+
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildHistorialItem('Aspirina', 'Tomada a las 08:30 AM', const Color(0xFF11CAA0), true),
+                  _buildHistorialItem('Vitamina C', 'Tomada a las 09:15 AM', const Color(0xFF0066FF), true),
+                  _buildHistorialItem('Paracetamol', 'Omitida', Colors.red, false),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final Color color;
-
-  const _StatCard({required this.title, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildHistorialItem(String nombre, String estado, Color color, bool tomada) {
     return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: Colors.white, 
-        borderRadius: BorderRadius.circular(12.r), 
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: Column(
+      child: Row(
         children: [
-          Text(value, style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: color)),
-          Text(title, style: AppTypography.body),
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: Icon(Icons.medication, color: color),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nombre, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                SizedBox(height: 4.h),
+                Text(estado, style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500)),
+              ],
+            ),
+          ),
+          Icon(tomada ? Icons.check_circle : Icons.cancel, color: color, size: 28.sp),
         ],
       ),
     );
