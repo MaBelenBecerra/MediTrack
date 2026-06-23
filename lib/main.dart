@@ -23,7 +23,7 @@ void main() async {
   
   await Hive.initFlutter();
   Hive.registerAdapter(MedicationModelAdapter());
-  await Hive.openBox('medications_box');
+  await Hive.openBox<MedicationModel>('medications_box');
 
   runApp(
     MultiProvider(
