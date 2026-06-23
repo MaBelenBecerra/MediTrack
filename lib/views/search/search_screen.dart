@@ -1,7 +1,4 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:meditrack_design_system/app_colors.dart';
-import 'package:meditrack_design_system/app_typography.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -11,74 +8,120 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final Dio _dio = Dio();
-  List<dynamic> _resultados = [];
-  bool _isLoading = false;
+  final TextEditingController _searchController = TextEditingController();
+  
+  // Lista simulada del resultado de la API de la FDA
+  final List<Map<String, String>> _results = [
+    {'name': 'Ibuprofen Dye Free', 'desc': 'Purpose Pain reliever/fever reducer'},
+    {'name': 'Care One Ibuprofen', 'desc': 'Purposes Pain reliever/fever reducer'},
+    {'name': 'Ibuprofen', 'desc': 'Sin descripción disponible'},
+    {'name': 'Leader Ibuprofen', 'desc': 'Purposes Pain reliever/fever reducer'},
+    {'name': 'Concentrated Ibuprofen Infants', 'desc': 'PURPOSE Pain reliever/fever reducer'},
+  ];
 
-  Future<void> _buscar(String query) async {
-    if (query.isEmpty) return;
-    setState(() => _isLoading = true);
-    
-    try {
-      final response = await _dio.get('https://api.fda.gov/drug/label.json?search=openfda.brand_name:$query&limit=5');
-      
-      if (!mounted) return;
-      
-      setState(() {
-        _resultados = response.data['results'] ?? [];
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se encontraron resultados'), 
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Buscar Prospecto (API)'), backgroundColor: AppColors.primary),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              onSubmitted: _buscar,
-              decoration: InputDecoration(
-                hintText: 'Ej: Tylenol, Advil...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: const Color(0xFFF4F7FB),
+      appBar: AppBar(
+        title: const Text(
+          'Buscar Prospecto (API)',
+          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18.0),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03), 
+                    blurRadius: 10.0, 
+                    offset: const Offset(0, 4)
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Buscar en la base de datos FDA...',
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 15.0),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF0066FF)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.0), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+                ),
               ),
             ),
-          ),
-          if (_isLoading) const CircularProgressIndicator(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _resultados.length,
-              itemBuilder: (context, index) {
-                final item = _resultados[index];
-                final brandName = item['openfda']?['brand_name']?[0] ?? 'Desconocido';
-                final purpose = item['purpose']?[0] ?? 'Sin descripción';
-                return ListTile(
-                  leading: const Icon(
-                    Icons.medical_information, 
-                    color: AppColors.primary,
-                  ),
-                  title: Text(brandName, style: AppTypography.body),
-                  subtitle: Text(purpose, maxLines: 2, overflow: TextOverflow.ellipsis),
-                );
-              },
+            const SizedBox(height: 24.0),
+            
+            // Lista de medicamentos encontrados
+            Expanded(
+              child: ListView.builder(
+                itemCount: _results.length,
+                itemBuilder: (context, index) {
+                  final item = _results[index];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02), 
+                          blurRadius: 8.0, 
+                          offset: const Offset(0, 2)
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0066FF).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: const Icon(Icons.medical_information_outlined, color: Color(0xFF0066FF), size: 24.0),
+                        ),
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item['name']!,
+                                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                              ),
+                              const SizedBox(height: 4.0),
+                              Text(
+                                item['desc']!,
+                                style: TextStyle(fontSize: 13.0, color: Colors.grey.shade500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
