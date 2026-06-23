@@ -1,30 +1,45 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../core/network/dio_client.dart';
 
 class AuthViewModel extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isLoading = false;
+  
   bool get isLoading => _isLoading;
+  User? get currentUser => _auth.currentUser;
 
-  Future<bool> login(String username, String password) async {
+  Future<bool> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
-
     try {
-      // Aquí harías tu _dio.post('/auth/login') hacia NestJS
-      // Simulamos la respuesta exitosa con un token falso por ahora:
-      await Future.delayed(const Duration(seconds: 2)); 
-      final fakeToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-      
-      // Guardamos el token en nuestro cliente Dio
-      DioClient().setAuthToken(fakeToken);
-      
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       _isLoading = false;
       notifyListeners();
-      return true; // Login exitoso
+      return true;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return false; // Falló el login
+      return false;
     }
+  }
+
+  Future<bool> register(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    await _auth.signOut();
+    notifyListeners();
   }
 }
