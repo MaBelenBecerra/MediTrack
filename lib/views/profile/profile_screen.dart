@@ -55,7 +55,6 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-  // Función para la exportación del reporte PDF
   void _exportarPdf(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -63,7 +62,9 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Icon(Icons.picture_as_pdf, color: Colors.white),
             SizedBox(width: 12.0),
-            Text('📄 Generando Historia Clínica en PDF... ¡Exportado con éxito!'),
+            Expanded(
+              child: Text('📄 Generando Historia Clínica en PDF... ¡Exportado con éxito!'),
+            ),
           ],
         ),
         backgroundColor: Color(0xFF11CAA0),
