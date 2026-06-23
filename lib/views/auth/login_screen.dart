@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
-import '../home/home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success && mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()), 
+        MaterialPageRoute(builder: (_) => const DashboardScreen()), 
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -63,70 +63,99 @@ class _LoginScreenState extends State<LoginScreen> {
     final isLoading = context.watch<AuthViewModel>().isLoading;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF1F5F9),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Icon(Icons.medical_services, size: 80, color: Colors.blue),
-              const SizedBox(height: 24),
-              Text(
-                _isLogin ? 'Bienvenido a MediTrack' : 'Crea tu cuenta',
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Card(
+              color: Colors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
               ),
-              const SizedBox(height: 40),
-              TextField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Correo electrónico',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Icon(Icons.medical_services, size: 80, color: Color(0xFF005088)),
+                    const SizedBox(height: 24),
+                    Text(
+                      _isLogin ? 'Bienvenido a MediTrack' : 'Crea tu cuenta',
+                      style: const TextStyle(
+                        fontSize: 28, 
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF005088),
+                        fontFamily: 'Merriweather',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    TextField(
+                      controller: _emailController,
+                      decoration: InputDecoration(
+                        labelText: 'Correo electrónico',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: const Icon(Icons.email, color: Color(0xFF005088)),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Contraseña (mínimo 6 carácteres)',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        prefixIcon: const Icon(Icons.lock, color: Color(0xFF005088)),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 24),
+                    if (isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      ElevatedButton(
+                        onPressed: _submit,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: const Color(0xFF005088),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          _isLogin ? 'Iniciar Sesión' : 'Registrarse',
+                          style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isLogin = !_isLogin;
+                        });
+                      },
+                      child: Text(
+                        _isLogin
+                            ? '¿No tienes cuenta? Regístrate aquí'
+                            : '¿Ya tienes cuenta? Inicia sesión',
+                        style: const TextStyle(color: Color(0xFF11CAA0), fontSize: 15, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
                 ),
-                keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Contraseña (mínimo 6 caracteres)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 24),
-              if (isLoading)
-                const Center(child: CircularProgressIndicator())
-              else
-                ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: Text(
-                    _isLogin ? 'Iniciar Sesión' : 'Registrarse',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isLogin = !_isLogin;
-                  });
-                },
-                child: Text(
-                  _isLogin
-                      ? '¿No tienes cuenta? Regístrate aquí'
-                      : '¿Ya tienes cuenta? Inicia sesión',
-                  style: const TextStyle(color: Colors.blueGrey),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

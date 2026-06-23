@@ -16,13 +16,16 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF1F5F9),
       appBar: AppBar(
         title: Text(
           'MediTrack',
-          style: AppTypography.titleLarge.copyWith(color: Colors.white),
+          style: AppTypography.titleLarge.copyWith(
+            color: Colors.white,
+            fontFamily: 'Merriweather',
+          ),
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color(0xFF005088),
         elevation: 0,
         actions: [
           IconButton(
@@ -62,27 +65,26 @@ class DashboardScreen extends StatelessWidget {
                   padding: EdgeInsets.all(12.w),
                   child: Row(
                     children: [
-                      // Previsualización de foto en miniatura redondeada
                       med.imagePath != null && med.imagePath!.isNotEmpty
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(12.r),
                               child: Image.file(
                                 File(med.imagePath!),
-                                width: 65.w,
-                                height: 65.w,
+                                width: 70.w,
+                                height: 70.w,
                                 fit: BoxFit.cover,
                               ),
                             )
                           : Container(
-                              width: 65.w,
-                              height: 65.w,
+                              width: 70.w,
+                              height: 70.w,
                               decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
+                                color: const Color(0xFFE2E8F0),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               child: const Icon(
                                 Icons.medication,
-                                color: AppColors.primary,
+                                color: Color(0xFF005088),
                                 size: 32,
                               ),
                             ),
@@ -95,6 +97,7 @@ class DashboardScreen extends StatelessWidget {
                               med.nombre,
                               style: AppTypography.titleMedium.copyWith(
                                 fontWeight: FontWeight.bold,
+                                color: const Color(0xFF005088),
                               ),
                             ),
                             SizedBox(height: 4.h),
@@ -102,15 +105,15 @@ class DashboardScreen extends StatelessWidget {
                               'Dosis: ${med.dosis}',
                               style: AppTypography.body.copyWith(color: Colors.grey[700]),
                             ),
-                            SizedBox(height: 4.h),
+                            SizedBox(height: 6.h),
                             Row(
                               children: [
-                                const Icon(Icons.access_time, size: 14, color: AppColors.primary),
-                                SizedBox(width: 4.w),
+                                const Icon(Icons.access_time, size: 16, color: Color(0xFF11CAA0)), // Acento Teal
+                                SizedBox(width: 6.w),
                                 Text(
                                   med.hora,
                                   style: AppTypography.body.copyWith(
-                                    color: AppColors.primary,
+                                    color: const Color(0xFF11CAA0),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -122,14 +125,14 @@ class DashboardScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(
                           Icons.check_circle_outline,
-                          color: AppColors.success,
-                          size: 36,
+                          color: Color(0xFF11CAA0),
+                          size: 38,
                         ),
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('¡Pastilla marcada como tomada!'),
-                              backgroundColor: AppColors.success,
+                              backgroundColor: Color(0xFF11CAA0),
                             ),
                           );
                         },
@@ -143,14 +146,14 @@ class DashboardScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color(0xFF11CAA0),
         onPressed: () async {
           await PermissionManager.requestAppPermissions();
           if (context.mounted) {
             _mostrarDialogoAgregar(context);
           }
         },
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
       ),
     );
   }
@@ -174,7 +177,7 @@ class DashboardScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(24.r),
               ),
               child: Padding(
-                padding: EdgeInsets.all(20.w),
+                padding: EdgeInsets.all(24.w),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -183,35 +186,44 @@ class DashboardScreen extends StatelessWidget {
                       Text(
                         'Nuevo Medicamento',
                         style: AppTypography.titleLarge.copyWith(
-                          color: AppColors.primary,
+                          color: const Color(0xFF005088),
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'Merriweather',
                         ),
                       ),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 20.h),
                       TextField(
                         controller: nombreController,
                         decoration: InputDecoration(
                           labelText: 'Nombre de la pastilla',
-                          prefixIcon: const Icon(Icons.medication),
+                          prefixIcon: const Icon(Icons.medication, color: Color(0xFF005088)),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      TextField(
-                        controller: dosisController,
-                        decoration: InputDecoration(
-                          labelText: 'Dosis (ej. 1 pastilla)',
-                          prefixIcon: const Icon(Icons.format_list_numbered),
-                          border: OutlineInputBorder(
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                         ),
                       ),
                       SizedBox(height: 16.h),
+                      TextField(
+                        controller: dosisController,
+                        decoration: InputDecoration(
+                          labelText: 'Dosis (ej. 1 pastilla)',
+                          prefixIcon: const Icon(Icons.format_list_numbered, color: Color(0xFF005088)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(color: Color(0xFF005088), width: 2),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
                       
-                      // Selector de hora tipo botón moderno
+                      // Selector de hora estilizado
                       InkWell(
                         borderRadius: BorderRadius.circular(12.r),
                         onTap: () async {
@@ -224,14 +236,14 @@ class DashboardScreen extends StatelessWidget {
                           }
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey.shade400),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time, color: AppColors.primary),
+                              const Icon(Icons.access_time, color: Color(0xFF11CAA0)),
                               SizedBox(width: 12.w),
                               Text(
                                 horaSeleccionada == null 
@@ -247,27 +259,27 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 20.h),
 
-                      // Previsualización de la foto dentro del modal
+                      // Previsualización de la fotografía tomada
                       if (rutaImagen != null) ...[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12.r),
                           child: Image.file(
                             File(rutaImagen!), 
-                            height: 120.h, 
+                            height: 140.h, 
                             width: double.infinity, 
                             fit: BoxFit.cover,
                           ),
                         ),
-                        SizedBox(height: 12.h),
+                        SizedBox(height: 16.h),
                       ],
                         
-                      // Botón para tomar fotografía
+                      // Botón de cámara
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          minimumSize: Size(double.infinity, 50.h),
+                          backgroundColor: const Color(0xFF11CAA0),
+                          minimumSize: Size(double.infinity, 52.h),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.r),
                           ),
@@ -285,9 +297,9 @@ class DashboardScreen extends StatelessWidget {
                           }
                         },
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 24.h),
                       
-                      // Acciones inferiores (Guardar / Cancelar)
+                      // Acciones inferiores
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -295,11 +307,11 @@ class DashboardScreen extends StatelessWidget {
                             onPressed: () => Navigator.pop(context),
                             child: const Text('Cancelar', style: TextStyle(color: Colors.grey, fontSize: 16)),
                           ),
-                          SizedBox(width: 8.w),
+                          SizedBox(width: 12.w),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.success,
-                              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                              backgroundColor: const Color(0xFF005088),
+                              padding: EdgeInsets.symmetric(horizontal: 28.w, vertical: 14.h),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
