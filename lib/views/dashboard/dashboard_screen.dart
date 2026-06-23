@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,23 +20,16 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'MediTrack',
-          style: AppTypography.titleLarge.copyWith(
-            color: Colors.white,
-          ),
+          style: AppTypography.titleLarge.copyWith(color: Colors.white),
         ),
         backgroundColor: AppColors.primary,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.analytics,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.analytics, color: Colors.white),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const AdherenceScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const AdherenceScreen()),
             ),
           ),
         ],
@@ -46,9 +40,7 @@ class DashboardScreen extends StatelessWidget {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text(
-                    'Modo sin conexión. Mostrando datos locales.',
-                  ),
+                  content: Text('Modo sin conexión. Mostrando datos locales.'),
                   backgroundColor: AppColors.alert,
                   duration: Duration(seconds: 3),
                 ),
@@ -74,29 +66,60 @@ class DashboardScreen extends StatelessWidget {
               return Card(
                 color: Colors.white,
                 margin: EdgeInsets.only(bottom: 12.h),
-                elevation: 2,
+                elevation: 4,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: AppColors.primaryLight,
-                    child: Icon(
-                      Icons.medication,
-                      color: AppColors.primary,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ListTile(
+                    leading: med.imagePath != null && med.imagePath!.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10.r),
+                            child: Image.file(
+                              File(med.imagePath!),
+                              width: 55.w,
+                              height: 55.w,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : CircleAvatar(
+                            radius: 25.r,
+                            backgroundColor: AppColors.primaryLight,
+                            child: Icon(Icons.medication, color: AppColors.primary, size: 28.sp),
+                          ),
+                    title: Text(
+                      med.nombre,
+                      style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  title: Text(
-                    med.nombre,
-                    style: AppTypography.titleMedium,
-                  ),
-                  subtitle: Text(
-                    '${med.dosis} • ${med.hora}',
-                    style: AppTypography.body,
-                  ),
-                  trailing: const Icon(
-                    Icons.check_circle_outline,
-                    color: AppColors.success,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.vaccines, size: 16.sp, color: Colors.grey),
+                          SizedBox(width: 4.w),
+                          Text(med.dosis, style: AppTypography.body),
+                          SizedBox(width: 12.w),
+                          Icon(Icons.access_time, size: 16.sp, color: AppColors.primary),
+                          SizedBox(width: 4.w),
+                          Text(
+                            med.hora,
+                            style: AppTypography.body.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.check_circle_outline, color: AppColors.success, size: 32),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('¡Pastilla marcada como tomada!')),
+                        );
+                      },
+                    ),
                   ),
                 ),
               );
@@ -108,15 +131,11 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: AppColors.primary,
         onPressed: () async {
           await PermissionManager.requestAppPermissions();
-
           if (context.mounted) {
             _mostrarDialogoAgregar(context);
           }
         },
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
@@ -124,109 +143,129 @@ class DashboardScreen extends StatelessWidget {
   void _mostrarDialogoAgregar(BuildContext context) {
     final nombreController = TextEditingController();
     final dosisController = TextEditingController();
-    final horaController = TextEditingController();
-
+    
+    TimeOfDay? horaSeleccionada;
     String? rutaImagen;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: const Text(
-            'Nuevo Medicamento',
-            style: AppTypography.titleMedium,
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nombreController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre de la pastilla',
-                  ),
-                ),
-                TextField(
-                  controller: dosisController,
-                  decoration: const InputDecoration(
-                    labelText: 'Dosis (ej. 1 pastilla)',
-                  ),
-                ),
-                TextField(
-                  controller: horaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Hora (ej. 08:00 AM)',
-                  ),
-                ),
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+              title: const Text('Nuevo Medicamento', style: AppTypography.titleMedium),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nombreController,
+                      decoration: InputDecoration(
+                        labelText: 'Nombre de la pastilla',
+                        prefixIcon: const Icon(Icons.medication),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    TextField(
+                      controller: dosisController,
+                      decoration: InputDecoration(
+                        labelText: 'Dosis (ej. 1 pastilla)',
+                        prefixIcon: const Icon(Icons.format_list_numbered),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    
+                    ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        side: const BorderSide(color: Colors.grey),
+                      ),
+                      leading: const Icon(Icons.access_time, color: AppColors.primary),
+                      title: Text(
+                        horaSeleccionada == null 
+                            ? 'Seleccionar Hora' 
+                            : horaSeleccionada!.format(context),
+                        style: TextStyle(
+                          color: horaSeleccionada == null ? Colors.grey : Colors.black,
+                          fontWeight: horaSeleccionada == null ? FontWeight.normal : FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () async {
+                        final TimeOfDay? picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) {
+                          setStateDialog(() => horaSeleccionada = picked);
+                        }
+                      },
+                    ),
+                    SizedBox(height: 16.h),
 
-                SizedBox(height: 16.h),
+                    if (rutaImagen != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12.r),
+                          child: Image.file(File(rutaImagen!), height: 100.h, width: double.infinity, fit: BoxFit.cover),
+                        ),
+                      ),
+                      
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        minimumSize: Size(double.infinity, 45.h),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                      ),
+                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                      label: Text(rutaImagen == null ? 'Tomar Foto' : 'Cambiar Foto', style: const TextStyle(color: Colors.white)),
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final XFile? foto = await picker.pickImage(source: ImageSource.camera);
+                        
+                        if (foto != null) {
+                          setStateDialog(() => rutaImagen = foto.path);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                  onPressed: () {
+                    if (nombreController.text.isEmpty || dosisController.text.isEmpty || horaSeleccionada == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Por favor llena todos los datos y la hora')),
+                      );
+                      return;
+                    }
 
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Tomar Foto a la Pastilla'),
-                  onPressed: () async {
-                    final picker = ImagePicker();
-
-                    final XFile? foto = await picker.pickImage(
-                      source: ImageSource.camera,
+                    final nuevoMedicamento = MedicationModel(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      nombre: nombreController.text,
+                      dosis: dosisController.text,
+                      hora: horaSeleccionada!.format(context),
+                      imagePath: rutaImagen,
                     );
 
-                    if (foto != null) {
-                      rutaImagen = foto.path;
-
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Foto capturada correctamente'),
-                          ),
-                        );
-                      }
-                    }
+                    context.read<DashboardViewModel>().addMedication(nuevoMedicamento);
+                    Navigator.pop(context);
                   },
+                  child: const Text('Guardar', style: TextStyle(color: Colors.white)),
                 ),
               ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Cancelar',
-                style: TextStyle(
-                  color: AppColors.textGray,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              onPressed: () {
-                final nuevoMedicamento = MedicationModel(
-                  id: DateTime.now()
-                      .millisecondsSinceEpoch
-                      .toString(),
-                  nombre: nombreController.text,
-                  dosis: dosisController.text,
-                  hora: horaController.text,
-                  imagePath: rutaImagen,
-                );
-
-                context
-                    .read<DashboardViewModel>()
-                    .addMedication(nuevoMedicamento);
-
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Guardar',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+            );
+          }
         );
       },
     );
