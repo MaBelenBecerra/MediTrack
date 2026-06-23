@@ -1,178 +1,170 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:meditrack_design_system/app_colors.dart';
-import 'package:meditrack_design_system/app_typography.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:permission_handler/permission_handler.dart';
-import 'package:printing/printing.dart';
-import 'package:provider/provider.dart';
-
-import '../../viewmodels/auth_viewmodel.dart';
-import '../auth/login_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authViewModel = context.watch<AuthViewModel>();
-    final userEmail = authViewModel.currentUser?.email ?? 'Usuario Invitado';
+    final userEmail = FirebaseAuth.instance.currentUser?.email ?? 'paciente@meditrack.com';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
-        backgroundColor: AppColors.primary,
-      ),
-      body: Center(
+      backgroundColor: const Color(0xFFF4F7FB),
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircleAvatar(
-              radius: 60,
-              backgroundColor: AppColors.primary,
-              child: Icon(
-                Icons.person,
-                size: 60,
-                color: Colors.white,
+            // HEADER CON DEGRADADO CORPORATIVO
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.only(top: 80.h, bottom: 40.h),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF005088), Color(0xFF11CAA0)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40.r),
+                  bottomRight: Radius.circular(40.r),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-
-            const Text(
-              'Paciente Activo',
-              style: AppTypography.titleLarge,
-            ),
-
-            const SizedBox(height: 8),
-
-            Text(
-              userEmail,
-              style: AppTypography.body,
-            ),
-
-            const SizedBox(height: 40),
-
-            // Botón de cerrar sesión
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.white,
-              ),
-              label: const Text(
-                'Cerrar Sesión',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () async {
-                await authViewModel.logout();
-
-                if (context.mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const LoginScreen(),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 5))
+                      ],
                     ),
-                    (route) => false,
-                  );
-                }
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            // Botón de diagnóstico de hardware
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueGrey,
-              ),
-              icon: const Icon(
-                Icons.memory,
-                color: Colors.white,
-              ),
-              label: const Text(
-                'Diagnóstico Hardware',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () async {
-                // Feature de permisos
-                await Permission.camera.request();
-
-                // Feature de Platform Channels
-                const platform = MethodChannel(
-                  'meditrack.com/battery',
-                );
-
-                try {
-                  final int batteryLevel =
-                      await platform.invokeMethod('getBatteryLevel');
-
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Batería del dispositivo: $batteryLevel%',
-                        ),
-                        backgroundColor: AppColors.primary,
-                      ),
-                    );
-                  }
-                } on PlatformException catch (_) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'No se pudo obtener el nivel de batería.',
-                        ),
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            // Botón para exportar PDF
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              icon: const Icon(
-                Icons.picture_as_pdf,
-                color: Colors.white,
-              ),
-              label: const Text(
-                'Exportar Historia Clínica',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () async {
-                final pdf = pw.Document();
-
-                pdf.addPage(
-                  pw.Page(
-                    build: (pw.Context context) => pw.Center(
-                      child: pw.Text(
-                        'Historia Clínica - MediTrack\n\nPaciente: Activo\nEstado: Estable',
-                        style: const pw.TextStyle(
-                          fontSize: 24,
-                        ),
-                        textAlign: pw.TextAlign.center,
-                      ),
+                    child: CircleAvatar(
+                      radius: 55.r,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 60.sp, color: const Color(0xFF005088)),
                     ),
                   ),
-                );
+                  SizedBox(height: 16.h),
+                  Text(
+                    'Paciente Activo',
+                    style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20.r),
+                    ),
+                    child: Text(
+                      userEmail,
+                      style: TextStyle(fontSize: 14.sp, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            SizedBox(height: 30.h),
 
-                await Printing.layoutPdf(
-                  onLayout: (PdfPageFormat format) async => pdf.save(),
-                );
-              },
+            // MENÚ DE OPCIONES
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Configuración de Sistema',
+                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+                  ),
+                  SizedBox(height: 16.h),
+                  
+                  // Botón Hardware
+                  _buildProfileOption(
+                    context,
+                    icon: Icons.memory,
+                    color: const Color(0xFF005088),
+                    title: 'Diagnóstico de Hardware',
+                    subtitle: 'Estado de batería y sensores nativos',
+                    onTap: () {
+                      // Lógica feature 9
+                    },
+                  ),
+
+                  // Botón Exportar PDF
+                  _buildProfileOption(
+                    context,
+                    icon: Icons.picture_as_pdf,
+                    color: const Color(0xFF11CAA0),
+                    title: 'Exportar Historia Clínica',
+                    subtitle: 'Generar reporte de adherencia',
+                    onTap: () {
+                      // Lógica de exportación
+                    },
+                  ),
+
+                  SizedBox(height: 24.h),
+                  
+                  // Botón Cerrar Sesión
+                  _buildProfileOption(
+                    context,
+                    icon: Icons.logout,
+                    color: Colors.redAccent,
+                    title: 'Cerrar Sesión',
+                    subtitle: 'Desconectar cuenta actual',
+                    isDestructive: true,
+                    onTap: () async {
+                      await FirebaseAuth.instance.signOut();
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileOption(BuildContext context, {
+    required IconData icon, 
+    required Color color, 
+    required String title, 
+    required String subtitle, 
+    required VoidCallback onTap,
+    bool isDestructive = false,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.r),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+        leading: Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: color, size: 24.sp),
+        ),
+        title: Text(
+          title, 
+          style: TextStyle(
+            fontSize: 16.sp, 
+            fontWeight: FontWeight.bold, 
+            color: isDestructive ? Colors.redAccent : const Color(0xFF1E293B)
+          ),
+        ),
+        subtitle: Text(subtitle, style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16.sp, color: Colors.grey.shade400),
+        onTap: onTap,
       ),
     );
   }
