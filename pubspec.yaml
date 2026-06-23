@@ -43,6 +43,9 @@ dependencies:
   flutter_local_notifications: ^22.0.0
   firebase_auth: ^6.5.4
   cloud_firestore: ^6.6.0
+  meditrack_design_system:
+    git:
+      url: https://github.com/MaBelenBecerra/meditrack_design_system.git
 
 dev_dependencies:
   flutter_test:
