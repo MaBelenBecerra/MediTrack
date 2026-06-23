@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meditrack_design_system/app_colors.dart';
 import 'package:meditrack_design_system/app_typography.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
@@ -36,15 +39,19 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+
             const Text(
               'Paciente Activo',
               style: AppTypography.titleLarge,
             ),
+
             const SizedBox(height: 8),
+
             Text(
               userEmail,
               style: AppTypography.body,
             ),
+
             const SizedBox(height: 40),
 
             // Botón de cerrar sesión
@@ -124,6 +131,44 @@ class ProfileScreen extends StatelessWidget {
                     );
                   }
                 }
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // Botón para exportar PDF
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              icon: const Icon(
+                Icons.picture_as_pdf,
+                color: Colors.white,
+              ),
+              label: const Text(
+                'Exportar Historia Clínica',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                final pdf = pw.Document();
+
+                pdf.addPage(
+                  pw.Page(
+                    build: (pw.Context context) => pw.Center(
+                      child: pw.Text(
+                        'Historia Clínica - MediTrack\n\nPaciente: Activo\nEstado: Estable',
+                        style: const pw.TextStyle(
+                          fontSize: 24,
+                        ),
+                        textAlign: pw.TextAlign.center,
+                      ),
+                    ),
+                  ),
+                );
+
+                await Printing.layoutPdf(
+                  onLayout: (PdfPageFormat format) async => pdf.save(),
+                );
               },
             ),
           ],
