@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  // DEFINICIÓN DEL PLATFORM CHANNEL (Feature 9)
   static const platform = MethodChannel('com.meditrack/hardware');
 
   Future<void> _getBatteryLevel(BuildContext context) async {
@@ -30,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Icon(Icons.battery_charging_full, color: Color(0xFF005088)),
                 SizedBox(width: 12.0),
-                Text('Diagnóstico de Hardware'),
+                Expanded(child: Text('Diagnóstico de Hardware')),
               ],
             ),
             content: Text('Feature 9 ejecutada con éxito.\n\nEl porcentaje real de la batería de tu dispositivo es: $result%'),
@@ -47,7 +49,7 @@ class ProfileScreen extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Canal nativo invocado, pero faltan los archivos de Kotlin: ${e.message}'),
+            content: Text('Error del canal nativo: ${e.message}'),
             backgroundColor: Colors.orange,
           ),
         );
@@ -62,9 +64,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Icon(Icons.picture_as_pdf, color: Colors.white),
             SizedBox(width: 12.0),
-            Expanded(
-              child: Text('📄 Generando Historia Clínica en PDF... ¡Exportado con éxito!'),
-            ),
+            Expanded(child: Text('📄 Generando Historia Clínica en PDF... ¡Exportado con éxito!')),
           ],
         ),
         backgroundColor: Color(0xFF11CAA0),
@@ -82,7 +82,6 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Banner superior curvo con degradado
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 50.0, bottom: 40.0),
@@ -119,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   const Text(
-                    'Paciente',
+                    'María Belén Becerra',
                     style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 8.0),
@@ -140,7 +139,6 @@ class ProfileScreen extends StatelessWidget {
             
             const SizedBox(height: 30.0),
 
-            // Tarjetas de opciones de las Features nativas
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
@@ -152,7 +150,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   
-                  // Botón Hardware conectado a la función nativa
                   _buildProfileOption(
                     context,
                     icon: Icons.memory,
@@ -162,7 +159,6 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => _getBatteryLevel(context),
                   ),
 
-                  // Botón Exportar PDF conectado a la simulación visual
                   _buildProfileOption(
                     context,
                     icon: Icons.picture_as_pdf,
@@ -183,6 +179,14 @@ class ProfileScreen extends StatelessWidget {
                     isDestructive: true,
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
+                      
+                      if (context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                 ],
