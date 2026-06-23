@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meditrack_design_system/design_system.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/design_system/design_system.dart';
 import '../../core/utils/permission_manager.dart';
 import '../../data/models/medication_model.dart';
 import '../../viewmodels/dashboard_viewmodel.dart';

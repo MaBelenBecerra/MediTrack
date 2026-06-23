@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meditrack_design_system/design_system.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/design_system/design_system.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../dashboard/dashboard_screen.dart';
 
