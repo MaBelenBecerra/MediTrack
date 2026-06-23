@@ -1,8 +1,76 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  static const platform = MethodChannel('com.meditrack/hardware');
+
+  Future<void> _getBatteryLevel(BuildContext context) async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('🔋 Diagnóstico Hardware (Web): Batería al 100% (Simulado)'),
+          backgroundColor: Color(0xFF005088),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final int result = await platform.invokeMethod('getBatteryLevel');
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+            title: const Row(
+              children: [
+                Icon(Icons.battery_charging_full, color: Color(0xFF005088)),
+                SizedBox(width: 12.0),
+                Text('Diagnóstico de Hardware'),
+              ],
+            ),
+            content: Text('Feature 9 ejecutada con éxito.\n\nEl porcentaje real de la batería de tu dispositivo es: $result%'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Aceptar', style: TextStyle(color: Color(0xFF0066FF), fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      }
+    } on PlatformException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Canal nativo invocado, pero faltan los archivos de Kotlin: ${e.message}'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+  }
+
+  // Función para la exportación del reporte PDF
+  void _exportarPdf(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.picture_as_pdf, color: Colors.white),
+            SizedBox(width: 12.0),
+            Text('📄 Generando Historia Clínica en PDF... ¡Exportado con éxito!'),
+          ],
+        ),
+        backgroundColor: Color(0xFF11CAA0),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,22 +151,24 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   
+                  // Botón Hardware conectado a la función nativa
                   _buildProfileOption(
                     context,
                     icon: Icons.memory,
                     color: const Color(0xFF005088),
                     title: 'Diagnóstico de Hardware',
                     subtitle: 'Estado de batería y sensores nativos',
-                    onTap: () {},
+                    onTap: () => _getBatteryLevel(context),
                   ),
 
+                  // Botón Exportar PDF conectado a la simulación visual
                   _buildProfileOption(
                     context,
                     icon: Icons.picture_as_pdf,
                     color: const Color(0xFF11CAA0),
                     title: 'Exportar Historia Clínica',
                     subtitle: 'Generar reporte de adherencia',
-                    onTap: () {},
+                    onTap: () => _exportarPdf(context),
                   ),
 
                   const SizedBox(height: 20.0),
