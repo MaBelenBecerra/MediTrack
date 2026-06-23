@@ -14,13 +14,14 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF4F7FB),
       body: SafeArea(
         child: Consumer<DashboardViewModel>(
           builder: (context, viewModel, child) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                //HEADER
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
                   child: Row(
@@ -34,9 +35,9 @@ class DashboardScreen extends StatelessWidget {
                             style: TextStyle(fontSize: 16.sp, color: Colors.grey.shade600),
                           ),
                           Text(
-                            'MaediTrack',
+                            'Paciente',
                             style: TextStyle(
-                              fontSize: 24.sp,
+                              fontSize: 26.sp,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFF1E293B),
                             ),
@@ -44,7 +45,7 @@ class DashboardScreen extends StatelessWidget {
                         ],
                       ),
                       CircleAvatar(
-                        radius: 24.r,
+                        radius: 26.r,
                         backgroundColor: const Color(0xFF0066FF).withValues(alpha: 0.1),
                         child: const Icon(Icons.person, color: Color(0xFF0066FF)),
                       ),
@@ -52,15 +53,12 @@ class DashboardScreen extends StatelessWidget {
                   ),
                 ),
 
+                //BANNER DE RECORDATORIO
                 Container(
                   margin: EdgeInsets.symmetric(horizontal: 24.w),
                   padding: EdgeInsets.all(24.w),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0066FF), Color(0xFF11CAA0)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
+                    color: const Color(0xFF0066FF),
                     borderRadius: BorderRadius.circular(20.r),
                     boxShadow: [
                       BoxShadow(
@@ -77,12 +75,20 @@ class DashboardScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '¡Aquí está tu progreso\nde hoy!',
+                              '¡Recordatorio!',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 18.sp,
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.bold,
-                                height: 1.2,
+                              ),
+                            ),
+                            SizedBox(height: 6.h),
+                            Text(
+                              'Tienes tomas pendientes\npara el día de hoy.',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 14.sp,
+                                height: 1.3,
                               ),
                             ),
                           ],
@@ -94,7 +100,7 @@ class DashboardScreen extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.vaccines, color: Colors.white, size: 32),
+                        child: const Icon(Icons.notifications_active, color: Colors.white, size: 32),
                       ),
                     ],
                   ),
@@ -102,17 +108,18 @@ class DashboardScreen extends StatelessWidget {
 
                 SizedBox(height: 24.h),
 
+                //TÍTULO DE LA LISTA
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Hoy',
+                        'Tus Medicamentos',
                         style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
                       ),
                       Text(
-                        '${viewModel.medications.length} Medicamentos',
+                        '${viewModel.medications.length} programados',
                         style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade500),
                       ),
                     ],
@@ -120,6 +127,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16.h),
 
+                //LISTA DE PASTILLAS CON SWITCH
                 Expanded(
                   child: viewModel.medications.isEmpty
                       ? const Center(child: Text('No hay pastillas programadas.'))
@@ -131,63 +139,7 @@ class DashboardScreen extends StatelessWidget {
                             final List<Color> colors = [const Color(0xFF0066FF), const Color(0xFF11CAA0), const Color(0xFF9333EA)];
                             final Color cardColor = colors[index % colors.length];
 
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 16.h),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16.r),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16.r),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border(left: BorderSide(color: cardColor, width: 4.w)),
-                                  ),
-                                  padding: EdgeInsets.all(16.w),
-                                  child: Row(
-                                    children: [
-                                      // Foto o Ícono
-                                      med.imagePath != null && med.imagePath!.isNotEmpty
-                                          ? ClipRRect(
-                                              borderRadius: BorderRadius.circular(12.r),
-                                              child: Image.file(File(med.imagePath!), width: 50.w, height: 50.w, fit: BoxFit.cover),
-                                            )
-                                          : Container(
-                                              width: 50.w, height: 50.w,
-                                              decoration: BoxDecoration(color: cardColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
-                                              child: Icon(Icons.medication, color: cardColor),
-                                            ),
-                                      SizedBox(width: 16.w),
-                                      
-                                      // Textos
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(med.nombre, style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
-                                            SizedBox(height: 4.h),
-                                            Text(med.dosis, style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500)),
-                                          ],
-                                        ),
-                                      ),
-                                      
-                                      // Check y Hora
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Icon(Icons.check_circle_outline, color: cardColor, size: 28.sp),
-                                          SizedBox(height: 8.h),
-                                          Text(med.hora, style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, color: cardColor)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
+                            return MedicationCard(med: med, cardColor: cardColor);
                           },
                         ),
                 ),
@@ -209,7 +161,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-
   void _mostrarDialogoAgregar(BuildContext context) {
     final nombreController = TextEditingController();
     final dosisController = TextEditingController();
@@ -226,40 +177,39 @@ class DashboardScreen extends StatelessWidget {
           builder: (context, setStateDialog) {
             return Padding(
               padding: EdgeInsets.only(
-                top: 24.w, left: 24.w, right: 24.w,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 24.w,
+                top: 24.w, 
+                left: 24.w, 
+                right: 24.w,
+                bottom: MediaQuery.of(context).viewInsets.bottom + MediaQuery.of(context).padding.bottom + 24.w,
               ),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Agregar Medicamento', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+                    Text('Agregar Medicamento', style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
                     SizedBox(height: 24.h),
                     
-                    // Inputs
                     TextField(
                       controller: nombreController,
                       decoration: InputDecoration(
                         labelText: 'Nombre de la pastilla',
                         prefixIcon: const Icon(Icons.medical_services_outlined, color: Color(0xFF0066FF)),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade300)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade300)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                       ),
                     ),
                     SizedBox(height: 16.h),
+                    
                     TextField(
                       controller: dosisController,
                       decoration: InputDecoration(
                         labelText: 'Dosis (ej. 1 tableta)',
                         prefixIcon: const Icon(Icons.view_list_outlined, color: Color(0xFF0066FF)),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade300)),
-                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: Colors.grey.shade300)),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                       ),
                     ),
                     SizedBox(height: 16.h),
                     
-                    // Horario
                     InkWell(
                       onTap: () async {
                         final picked = await showTimePicker(context: context, initialTime: TimeOfDay.now());
@@ -267,7 +217,7 @@ class DashboardScreen extends StatelessWidget {
                       },
                       child: Container(
                         padding: EdgeInsets.all(16.w),
-                        decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300), borderRadius: BorderRadius.circular(12.r)),
+                        decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade400), borderRadius: BorderRadius.circular(12.r)),
                         child: Row(
                           children: [
                             const Icon(Icons.access_time, color: Color(0xFF11CAA0)),
@@ -282,13 +232,11 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16.h),
 
-                    // Foto Preview
                     if (rutaImagen != null) ...[
                       ClipRRect(borderRadius: BorderRadius.circular(12.r), child: Image.file(File(rutaImagen!), height: 100.h, width: double.infinity, fit: BoxFit.cover)),
                       SizedBox(height: 12.h),
                     ],
 
-                    // Botón Tomar Foto (Azul Sólido)
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF0066FF),
@@ -304,13 +252,12 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24.h),
 
-                    // Botones Cancelar / Guardar
                     Row(
                       children: [
                         Expanded(
                           child: TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                            child: const Text('Cancelar', style: TextStyle(color: Colors.grey, fontSize: 16, fontWeight: FontWeight.bold)),
                           ),
                         ),
                         Expanded(
@@ -344,6 +291,104 @@ class DashboardScreen extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class MedicationCard extends StatefulWidget {
+  final MedicationModel med;
+  final Color cardColor;
+
+  const MedicationCard({super.key, required this.med, required this.cardColor});
+
+  @override
+  State<MedicationCard> createState() => _MedicationCardState();
+}
+
+class _MedicationCardState extends State<MedicationCard> {
+  bool isTaken = false; // Estado local para el Switch
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.r),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(left: BorderSide(color: widget.cardColor, width: 4.w)),
+          ),
+          padding: EdgeInsets.all(16.w),
+          child: Row(
+            children: [
+              // Foto o Ícono
+              widget.med.imagePath != null && widget.med.imagePath!.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Image.file(File(widget.med.imagePath!), width: 50.w, height: 50.w, fit: BoxFit.cover),
+                    )
+                  : Container(
+                      width: 50.w, height: 50.w,
+                      decoration: BoxDecoration(color: widget.cardColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12.r)),
+                      child: Icon(Icons.medication, color: widget.cardColor),
+                    ),
+              SizedBox(width: 16.w),
+              
+              // Textos
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.med.nombre, 
+                      style: TextStyle(
+                        fontSize: 16.sp, 
+                        fontWeight: FontWeight.bold, 
+                        color: const Color(0xFF1E293B),
+                        decoration: isTaken ? TextDecoration.lineThrough : null, // Tacha el texto si ya se tomó
+                      )
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(widget.med.dosis, style: TextStyle(fontSize: 13.sp, color: Colors.grey.shade500)),
+                    SizedBox(height: 6.h),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, size: 14.sp, color: widget.cardColor),
+                        SizedBox(width: 4.w),
+                        Text(widget.med.hora, style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold, color: widget.cardColor)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Switch
+              Switch(
+                value: isTaken,
+                activeColor: widget.cardColor,
+                onChanged: (value) {
+                  setState(() {
+                    isTaken = value;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(value ? 'Medicamento marcado como tomado' : 'Medicamento desmarcado'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
